@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body > label, body > div {
+    float: left;
+    padding: 5px;
+}
+</style>
+</head>
+<body>
+<label>
+    ddrescue output <button id="generate">Generate block list</button><br>
+    <textarea id="dd" rows="40" cols="50">
+0x1234567     /               1
+0x00000000  0x00123000  +
+0x00123000  0x00001000  -
+0x00124000  0x00001000  +
+0x00125000  0x00010000  -
+0x00135000  0x0000B000  +
+    </textarea>
+</label>
+<label>
+    Generated block list preview <a id="download"></a><br>
+    <textarea id="bb" rows="40" cols="50"></textarea>
+</label>
+<div>
+    Settings<br>
+    <label>Block size <input id="bs" type="number" value="4096"></label>
+</div>
+<script src="index.js"></script>
+</body>
+</html>
