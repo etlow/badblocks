@@ -20,10 +20,14 @@ generateButton.onclick = async function () {
             await setGenerateButtonText(`Generating ${i}/${lines.length}`);
         }
         const vals = lines[i];
-        const startBlock = parseInt(vals[0], 16) / blockSize;
-        const length = parseInt(vals[1], 16) / blockSize;
-        for (let addr = startBlock; addr < startBlock + length; addr++) {
-            blocks.push(addr);
+        const startAddr = parseInt(vals[0], 16);
+        const length = parseInt(vals[1], 16);
+        const startBlock = Math.floor(startAddr / blockSize);
+        const endBlock = Math.ceil((startAddr + length) / blockSize);
+        for (let addr = startBlock; addr < endBlock; addr++) {
+            if (addr != blocks[blocks.length - 1]) {
+                blocks.push(addr);
+            }
         }
     }
     await setGenerateButtonText('Joining array');
