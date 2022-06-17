@@ -44,6 +44,9 @@ generateButton.onclick = async function () {
     await setGenerateButtonText();
     const downloadLink = document.getElementById('download');
     const type = 'text/plain';
+    if (downloadLink.href != '') {
+        URL.revokeObjectURL(downloadLink.href);
+    }
     downloadLink.href = URL.createObjectURL(new Blob([output], { type }));
     downloadLink.download = 'blocks.txt';
     downloadLink.innerText = 'Download text file';
