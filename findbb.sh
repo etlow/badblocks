@@ -1,6 +1,5 @@
 #!/bin/bash
 . config.sh
-findbatch=1000
 currnum=$(ls -v extrablocks/bb* | tail -1 | sed 's/[^0-9*]//g')
 if [ -z $currnum ]; then
     echo No last bad blocks file found, starting from 0
