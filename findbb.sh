@@ -51,6 +51,10 @@ testpattern () {
     if [ -z "$countinitial" ]; then
         countinitial=${#bbin[@]}
     fi
+    # # Test this command in fbbcachetest.sh
+    # echo -ne "\e[Kcustom command to clear hard disk cache $currnum $1\r"
+    # sudo dd if=$dev of=/dev/null bs=$bbbs count=$((2**21/bbbs)) status=none
+    # echo -ne "\e[K"
 
     sudo badblocks -svb $bbbs -t $(printf %lu 0x$1$1$1$1) \
         -i tempfindbbi.txt -o tempfindbbo.txt \
