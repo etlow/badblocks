@@ -10,10 +10,11 @@ while read block; do
     badblockarr[block]=1
 done < $baseblocks
 
-# One block of size $bbbs
+# Range of blocks of size $bbbs (pattern seek count)
 rundd () {
-    printf "%.0s\x$1" $(seq 1 $bbbs) \
-        | sudo dd of=$dev bs=$bbbs seek=$2 count=1 iflag=fullblock oflag=direct status=none
+    echo -ne "\e[Kdd $1 seek=$2 count=$3\r"
+    printf "%$((bbbs*$3))s" | tr ' ' \\$(printf %o 0x$1) \
+        | sudo dd of=$dev bs=$bbbs seek=$2 count=$3 iflag=fullblock status=none
     # Can remove code below if dd exits on write errors
     local exitcode=$?
     if [ $exitcode -ne 0 ]; then
@@ -27,16 +28,25 @@ rundd () {
 # touch bad sectors, this code avoids touching them
 testpattern () {
     local bbin=()
+    local ddstart
+    local ddcount=0
     for ((block=currnum*findbatch; block<(currnum+1)*findbatch; block++)); do
-        echo -ne "dd $1 $block \r"
-        if [ -n "${badblockarr[block]}" ]; then
-            bbin+=($block) # block is bad
-        else
-            if ! rundd $1 $block; then # block is unknown/good
-                return 1
+        if [ -n "${badblockarr[block]}" ]; then # block is bad
+            bbin+=($block)
+            if [ $ddcount -gt 0 ]; then # dd the previous good range
+                if ! rundd $1 $ddstart $ddcount; then return 1; fi
+                ddcount=0
             fi
+        else # block is unknown/good
+            if [ $ddcount -eq 0 ]; then # start a new range
+                ddstart=$block
+            fi
+            ((ddcount++)) # add to range
         fi
     done
+    if [ $ddcount -gt 0 ]; then # dd the last good range
+        if ! rundd $1 $ddstart $ddcount; then return 1; fi
+    fi
     printf "%s\n" "${bbin[@]}" > tempfindbbi.txt
     if [ -z "$countinitial" ]; then
         countinitial=${#bbin[@]}
